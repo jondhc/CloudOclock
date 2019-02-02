@@ -51,6 +51,12 @@ public class MainActivity extends AppCompatActivity {
         setLocalTime();
     } //end onCreate
 
+    public void setRetrofit(){
+
+
+    } //end setRetrofit
+
+
     public void setLocalTime(){
         TextView localTime = findViewById(R.id.localTime);
         Calendar c = Calendar.getInstance();
@@ -62,11 +68,6 @@ public class MainActivity extends AppCompatActivity {
     public void setServerTime(){
 
     } //end setServerTime
-
-    public void setRetrofit(){
-
-
-    } //end setRetrofit
 
 
     public void update(View view){
