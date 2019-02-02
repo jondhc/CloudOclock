@@ -20,40 +20,23 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
+    Retrofit retrofit;
+    RestClient restClient;
+    TextView serverTime;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final TextView serverTime = findViewById(R.id.serverTime);
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://192.168.1.74:8000").addConverterFactory(ScalarsConverterFactory.create()).build();
-        RestClient restClient = retrofit.create(RestClient.class);
-        Call<String> call = restClient.getData();
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                String data = "";
-                switch (response.code()){
-                    case 200:
-                        data = response.body();
-                        serverTime.setText(data);
-                        showLongToast("This is the data" + data);
-                        break;
-                    default:
-                        showLongToast("Case not handled");
-                } //end switch-case
-            } //end onResponse
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                showLongToast(t.getMessage());
-            } //onFailure
-        }); //call enqueue
+        setRetrofit();
+        setServerTime();
         setLocalTime();
     } //end onCreate
 
     public void setRetrofit(){
-
-
+        serverTime = findViewById(R.id.serverTime);
+        retrofit = new Retrofit.Builder().baseUrl("http://192.168.1.74:8000").addConverterFactory(ScalarsConverterFactory.create()).build();
+        restClient = retrofit.create(RestClient.class);
     } //end setRetrofit
 
 
@@ -66,12 +49,33 @@ public class MainActivity extends AppCompatActivity {
     } //end setLocalTime
 
     public void setServerTime(){
+        Call<String> call = restClient.getData();
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String data = "";
+                switch (response.code()){
+                    case 200:
+                        data = response.body();
+                        serverTime.setText(data);
+                        //showLongToast("This is the data" + data);
+                        break;
+                    default:
+                        showLongToast("Case not handled");
+                } //end switch-case
+            } //end onResponse
 
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                showLongToast(t.getMessage());
+            } //onFailure
+        }); //call enqueue
     } //end setServerTime
 
 
     public void update(View view){
         setLocalTime();
+        setServerTime();
     } //end update
 
     public void showLongToast(String message) {
