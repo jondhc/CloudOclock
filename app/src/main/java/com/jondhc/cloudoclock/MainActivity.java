@@ -1,9 +1,12 @@
 package com.jondhc.cloudoclock;
 
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,10 +30,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setFullScreen();
         setContentView(R.layout.activity_main);
         setRetrofit();
         setServerTime();
         setLocalTime();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setServerTime();
+                setLocalTime();
+                handler.postDelayed(this, 1000);
+            } //end run
+        }, 1000);
     } //end onCreate
 
     public void setRetrofit(){
@@ -85,5 +98,10 @@ public class MainActivity extends AppCompatActivity {
     public void showShortToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     } //end showShortToast
+
+    public void setFullScreen() {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    } //end setFullScreen
 
 } //end MainActivity
