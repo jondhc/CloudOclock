@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,25 +33,31 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setFullScreen();
         setContentView(R.layout.activity_main);
-        setRetrofit();
-        setServerTime();
-        setLocalTime();
+    } //end onCreate
+
+    public void setRetrofit(String ipAddress, String portNumber){
+        serverTime = findViewById(R.id.serverTime);
+        retrofit = new Retrofit.Builder().baseUrl("http://"+ipAddress + ":" + portNumber).addConverterFactory(ScalarsConverterFactory.create()).build();
+        restClient = retrofit.create(RestClient.class);
+    } //end setRetrofit
+
+    public void start(View view){
+        EditText ipAddress = findViewById(R.id.ipAddress);
+        EditText portNumber = findViewById(R.id.portNumber);
+        EditText timeInterval = findViewById(R.id.interval);
+        String ip = ipAddress.getText().toString();
+        String port = portNumber.getText().toString();
+        final int interval = Integer.parseInt(timeInterval.getText().toString()) * 1000;
+        setRetrofit(ip, port);
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                setServerTime();
-                setLocalTime();
-                handler.postDelayed(this, 1000);
+                update();
+                handler.postDelayed(this, interval);
             } //end run
-        }, 1000);
-    } //end onCreate
-
-    public void setRetrofit(){
-        serverTime = findViewById(R.id.serverTime);
-        retrofit = new Retrofit.Builder().baseUrl("http://192.168.1.74:8000").addConverterFactory(ScalarsConverterFactory.create()).build();
-        restClient = retrofit.create(RestClient.class);
-    } //end setRetrofit
+        }, interval);
+    } //end start
 
 
     public void setLocalTime(){
@@ -86,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     } //end setServerTime
 
 
-    public void update(View view){
+    public void update(){
         setLocalTime();
         setServerTime();
     } //end update
