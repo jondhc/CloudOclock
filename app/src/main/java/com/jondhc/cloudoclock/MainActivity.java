@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -15,6 +16,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final TextView serverTime = findViewById(R.id.serverTime);
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://192.168.1.74:8000").build();
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://192.168.1.74:8000").addConverterFactory(ScalarsConverterFactory.create()).build();
         RestClient restClient = retrofit.create(RestClient.class);
         Call<String> call = restClient.getData();
         call.enqueue(new Callback<String>() {
@@ -33,14 +35,17 @@ public class MainActivity extends AppCompatActivity {
                 switch (response.code()){
                     case 200:
                         data = response.body();
-                        //serverTime.setText(data);
+                        serverTime.setText(data);
+                        showLongToast("This is the data" + data);
                         break;
+                    default:
+                        showLongToast("Case not handled");
                 } //end switch-case
             } //end onResponse
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Log.d("Error",t.getMessage());
+                showLongToast(t.getMessage());
             } //onFailure
         }); //call enqueue
         setLocalTime();
@@ -67,5 +72,13 @@ public class MainActivity extends AppCompatActivity {
     public void update(View view){
         setLocalTime();
     } //end update
+
+    public void showLongToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    } //end showLongToast
+
+    public void showShortToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    } //end showShortToast
 
 } //end MainActivity
